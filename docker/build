@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -e
+HERE=$(dirname $0)
+. $HERE/common
+
+cat << EOF > $HERE/Dockerfile.worker
+FROM $TAG_SHA
+ENTRYPOINT ["/usr/local/bin/hintr_worker"]
+EOF
+
+rm -rf naomi
+
+git clone https://github.com/mrc-ide/naomi
+
+docker build --pull \
+       -t $TAG_SHA \
+       -t $TAG_BRANCH \
+       -t $TAG_VERSION \
+       -f docker/Dockerfile \
+       .
+
+docker build \
+       -t $TAG_WORKER_SHA \
+       -t $TAG_WORKER_BRANCH \
+       -t $TAG_WORKER_VERSION \
+       -f docker/Dockerfile.worker \
+       .
+
+rm -f docker/Dockerfile.worker
+
+# We always push the SHA tagged versions, for debugging if the tests
+# after this step fail
+docker push $TAG_SHA
+docker push $TAG_WORKER_SHA

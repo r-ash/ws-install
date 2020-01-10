@@ -1,5 +1,3 @@
 # ws-install
 
-test edit readme
-test edit readme
-test edit readme
+This repo just for testing hintr updates from naomi-pr bot
